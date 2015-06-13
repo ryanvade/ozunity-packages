@@ -21,7 +21,7 @@ package() {
   install -Dm644 "${srcdir}/${pkgname}/Archane_Circles_06.jpg" "${pkgdir}/usr/share/backgrounds/Archane_Circles_06.jpg"
   install -Dm644 "${srcdir}/${pkgname}/Archane_Circles_07.jpg" "${pkgdir}/usr/share/backgrounds/Archane_Circles_07.jpg"
   install -Dm644 "${srcdir}/${pkgname}/Archane_Circles_08.jpg" "${pkgdir}/usr/share/backgrounds/Archane_Circles_08.jpg"
-  install -Dm644 "${srcdir}/${pkgname}/Smokey_Emerald_Editon.jpg" "${pkgdir}/usr/share/backgrounds/Smokey_Emerald_Editon.jpg"
+  install -Dm644 "${srcdir}/${pkgname}/Smokey_Emerald_Edition.jpg" "${pkgdir}/usr/share/backgrounds/Smokey_Emerald_Edition.jpg"
   install -Dm644 "${srcdir}/${pkgname}/new_Logo.png"           "${pkgdir}/usr/share/icons/OzUnity_Logo.png"
 
   mkdir -p ${pkgdir}/etc/skel/.local/share/gnome-background-properties
