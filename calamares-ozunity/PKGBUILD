@@ -1,0 +1,113 @@
+# Maintainer: Philip Müller <philm[at]manjaro[dog]org>
+
+pkgname=calamares-ozunity
+_pointver=2
+pkgver=1.1.${_pointver}
+pkgrel=2
+pkgdesc='Distribution-independent installer framework'
+arch=('i686' 'x86_64')
+license=(GPL)
+url="https://github.com/calamares"
+license=('LGPL')
+depends=('kconfig' 'kcoreaddons' 'ki18n' 'solid' 'yaml-cpp' 'parted' 'boost' 'hwinfo' 'qt5-svg' 'polkit-qt5')
+makedepends=('extra-cmake-modules' 'qt5-tools' 'git')
+backup=('usr/share/calamares/modules/bootloader.conf'
+        'usr/share/calamares/modules/displaymanager.conf'
+        'usr/share/calamares/modules/initcpio.conf'
+        'usr/share/calamares/modules/unpackfs.conf')
+_git=No
+_development=No
+
+
+if [ "$_git" == "Yes" ]; then
+   source+=(git+https://github.com/calamares/calamares.git
+            git+https://github.com/ryanvade/calamares-ozuinty.git)
+else
+   source+=("calamares-$pkgver-$pkgrel.tar.gz::https://github.com/calamares/calamares/releases/download/v$pkgver/calamares-$pkgver.tar.gz"
+            "$pkgname.zip::https://github.com/ryanvade/calamares-ozunity/archive/master.zip")
+fi
+
+sha256sums=('6adf5777f51998a88b19f37c3dd4bb8256be4464106ffbd5d1393ef67109d49c'
+            '2734d727e54da5c910906b8b649477b128942b55dfaf5826b368b13dc774447a')
+
+pkgver() {
+	if [ -e "$srcdir/calamares-$pkgver" ]; then
+		cd "$srcdir/calamares-$pkgver"
+	elif [ -e "$srcdir/calamares" ]; then
+		cd "$srcdir/calamares"
+	elif [ -e "$srcdir/calamares.git" ]; then
+		cd "$srcdir/calamares.git"
+	fi
+	if [ "$_git" == "Yes" ]; then
+		#echo "`git tag | tail -1 | sed 's|v||g'`.`git describe --always`"
+		#echo "1.1.2.$(date +%m%d).`git describe --always`"
+		#echo "1.1.2$(git describe --tags | sed 's|v||g' | sed 's|-|.|g')"
+		echo 1.1.2$(git rev-list --count HEAD).$(git rev-parse --short HEAD)
+	else
+		echo "$pkgver"
+	fi
+}
+
+prepare() {
+	if [ -e "$srcdir/calamares-$pkgver" ]; then
+		cp -a "$srcdir/$pkgname-master/." "$srcdir/calamares-$pkgver"
+		cd "$srcdir/calamares-$pkgver"
+	fi
+	#sed -i -e "s|CALAMARES_VERSION_PATCH 0|CALAMARES_VERSION_PATCH $_pointver|g" CMakeLists.txt
+
+	#if [ "$_git" == "Yes" ]; then
+	#	git submodule init
+	#	git submodule update
+	#else
+	#	rm -rf src/modules/partition/
+	#	mkdir -p src/modules/partition/
+	#	cd src/modules/partition/
+	#	git clone https://github.com/calamares/partitionmanager.git
+	#	cd partitionmanager
+	#	git checkout calamares
+	#fi
+}
+
+build() {
+	if [ -e "$srcdir/calamares-$pkgver" ]; then
+		cd "$srcdir/calamares-$pkgver"
+	elif [ -e "$srcdir/calamares" ]; then
+		cd "$srcdir/calamares"
+	elif [ -e "$srcdir/calamares.git" ]; then
+		cd "$srcdir/calamares.git"
+	fi
+
+	mkdir -p build
+	cd build
+        cmake .. \
+              -DCMAKE_BUILD_TYPE=Debug \
+              -DCMAKE_INSTALL_PREFIX=/usr \
+              -DWITH_PARTITIONMANAGER=1 \
+              -DCMAKE_INSTALL_LIBDIR=lib
+        make
+}
+
+package() {
+	if [ -e "$srcdir/calamares-$pkgver" ]; then
+		cd "$srcdir/calamares-$pkgver"
+	elif [ -e "$srcdir/calamares" ]; then
+		cd "$srcdir/calamares"
+	elif [ -e "$srcdir/calamares.git" ]; then
+		cd "$srcdir/calamares.git"
+	fi
+
+	cd build
+	make DESTDIR="$pkgdir" install
+	install -Dm644 "../conf/bootloader.conf" "$pkgdir/usr/share/calamares/modules/bootloader.conf"
+	install -Dm644 "../conf/initcpio.conf" "$pkgdir/usr/share/calamares/modules/initcpio.conf"
+	install -Dm644 "../conf/services.conf" "$pkgdir/usr/share/calamares/services.conf"
+	install -Dm644 "../conf/settings.conf" "$pkgdir/usr/share/calamares/settings.conf"
+	install -Dm644 "../conf/unpackfs.conf" "$pkgdir/usr/share/calamares/modules/unpackfs.conf"
+	mkdir -p /usr/share/icons/
+	install -Dm644 "../data/manjaro-icon.png" "$pkgdir/usr/share/icons/calamares.png"
+	install -Dm644 "../data/calamares.desktop" "$pkgdir/usr/share/applications/calamares.desktop"
+	rm -r "$pkgdir/usr/lib/calamares/modules/dummyprocess/"
+	rm -r "$pkgdir/usr/lib/calamares/modules/dummypython/"
+	rm "$pkgdir/usr/share/calamares/modules/dummypython.conf"
+}
+
