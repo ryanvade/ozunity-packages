@@ -1,5 +1,3 @@
-# Maintainer: Philip Müller <philm[at]manjaro[dog]org>
-
 pkgname=calamares-ozunity
 _pointver=2
 pkgver=1.1.${_pointver}
