@@ -1,6 +1,6 @@
 pkgname="plymouth-theme-ozunity-gnomish"
 pkgver=0.1
-pkgrel=1
+pkgrel=2
 pkgdesc="Oz Unity plymouth splash with GNOME background"
 arch=('any')
 url="https://github.com/ryanvade/plymouth-theme-ozunity-gnomish/"
